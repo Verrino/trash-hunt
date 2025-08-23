@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:trash_hunt/core/routing/app_router.dart';
 import 'package:trash_hunt/core/services/session_manager.dart';
 import '../viewmodels/auth_viewmodel.dart';
 
@@ -22,7 +23,7 @@ class _SignInScreenState extends State<SignInScreen> {
     if (session.currentUser != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) return;
-        Navigator.pushNamedAndRemoveUntil(context, '/home', (_) => false);
+        Navigator.pushNamedAndRemoveUntil(context, AppRouter.home, (_) => false);
       });
     }
   }
@@ -132,7 +133,7 @@ class _SignInScreenState extends State<SignInScreen> {
                             if (!context.mounted) return;
 
                             if (success) {
-                              Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                              Navigator.pushNamedAndRemoveUntil(context, AppRouter.home, (route) => false);
                             }
                           },
                           child: Container(
@@ -174,7 +175,7 @@ class _SignInScreenState extends State<SignInScreen> {
                             if (!context.mounted) return;
 
                             if (success) {
-                              Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                              Navigator.pushNamedAndRemoveUntil(context, AppRouter.home, (route) => false);
                             }
                           },
                           child: Container(
@@ -199,7 +200,7 @@ class _SignInScreenState extends State<SignInScreen> {
                           height: 12,
                         ),
                         InkWell(
-                          onTap: () => Navigator.pushNamed(context, '/signup'),
+                          onTap: () => Navigator.pushNamedAndRemoveUntil(context, AppRouter.signup, (route) => false),
                           child: Text("Don't have an account? Sign Up", style: TextStyle(color: scheme.primary)),
                         ),
                       ],

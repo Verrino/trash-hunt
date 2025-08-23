@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:trash_hunt/core/routing/app_router.dart';
 import '../viewmodels/auth_viewmodel.dart';
 
 class SignUpScreen extends StatefulWidget {
@@ -149,7 +150,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             if (!context.mounted) return;
 
                             if (success) {
-                              Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                              Navigator.pushNamedAndRemoveUntil(context, AppRouter.home, (route) => false);
                             }
                           },
                           child: Container(
@@ -191,7 +192,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             if (!context.mounted) return;
 
                             if (success) {
-                              Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                              Navigator.pushNamedAndRemoveUntil(context, AppRouter.home, (route) => false);
                             }
                           },
                           child: Container(
@@ -216,7 +217,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           height: 12,
                         ),
                         InkWell(
-                          onTap: () => Navigator.pushNamed(context, '/signin'),
+                          onTap: () => Navigator.pushNamedAndRemoveUntil(context, AppRouter.signin, (route) => false),
                           child: Text("Already have an account? Sign In", style: TextStyle(color: scheme.primary)),
                         ),
                       ],

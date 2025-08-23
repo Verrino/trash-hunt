@@ -1,15 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:trash_hunt/core/routing/app_router.dart';
 import 'package:trash_hunt/core/services/session_manager.dart';
-import 'package:trash_hunt/features/auth/views/signin_screen.dart';
 import 'package:trash_hunt/features/auth/viewmodels/auth_viewmodel.dart';
 import 'package:trash_hunt/features/auth/services/auth_repository_impl.dart';
+import 'package:trash_hunt/features/main/home/viewmodels/home_viewmodel.dart';
+import 'package:trash_hunt/features/main/quests/viewmodels/quest_viewmodel.dart';
+import 'package:trash_hunt/features/main/services/trash_repository_impl.dart';
 import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
+  
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -20,6 +29,12 @@ void main() async {
         Provider<SessionManager>(create: (_) => SessionManager()),
         ChangeNotifierProvider(
           create: (_) => AuthViewModel(AuthRepositoryImpl()),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => HomeViewModel(TrashRepositoryImpl()),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => QuestViewModel(TrashRepositoryImpl()),
         ),
       ],
       child: const MyApp(),
