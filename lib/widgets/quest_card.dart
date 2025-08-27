@@ -2,14 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:trash_hunt/core/routing/app_router.dart';
 
 class QuestCard extends StatelessWidget {
-  final String trashType;
-  const QuestCard({super.key, required this.trashType});
-
+  final Map<String, dynamic> questData;
+  const QuestCard({super.key, required this.questData});
 
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    String capitalizedTrashType = trashType[0].toUpperCase() + trashType.substring(1);
+    String capitalizedTitle = questData['title'][0].toUpperCase() + questData['title'].substring(1);
     return Card(
       elevation: 3,
       shape: RoundedRectangleBorder(
@@ -21,7 +20,7 @@ class QuestCard extends StatelessWidget {
           Navigator.pushNamed(
             context,
             AppRouter.questDetail,
-            arguments: {'type': trashType},
+            arguments: {'questData': questData},
           );
         },
         child: Row(
@@ -35,7 +34,7 @@ class QuestCard extends StatelessWidget {
                 ),
                 const SizedBox(width: 12),
                 Text(
-                  capitalizedTrashType,
+                  capitalizedTitle,
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,

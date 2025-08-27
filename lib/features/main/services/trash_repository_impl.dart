@@ -11,7 +11,7 @@ class TrashRepositoryImpl extends TrashRepository {
 
     try {
       final snapshot = await _fireStore.collection('trash').get();
-      trash = snapshot.docs.map((doc) => Trash.fromJson(doc.data())).toList();
+      trash = snapshot.docs.map((doc) => Trash.fromJson(doc.data(), doc.id)).toList();
     } catch (e) {
       // Handle error
     }

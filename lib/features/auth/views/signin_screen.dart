@@ -21,9 +21,15 @@ class _SignInScreenState extends State<SignInScreen> {
     super.initState();
     final session = context.read<SessionManager>();
     if (session.currentUser != null) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
+      final vm = context.read<AuthViewModel>();
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        final isHunter = await vm.checkHunter();
         if (!mounted) return;
-        Navigator.pushNamedAndRemoveUntil(context, AppRouter.home, (_) => false);
+        if (isHunter) {
+          Navigator.pushNamedAndRemoveUntil(context, AppRouter.home, (_) => false);
+        } else {
+          Navigator.pushNamedAndRemoveUntil(context, AppRouter.createHunter, (_) => false);
+        }
       });
     }
   }
@@ -133,7 +139,10 @@ class _SignInScreenState extends State<SignInScreen> {
                             if (!context.mounted) return;
 
                             if (success) {
-                              Navigator.pushNamedAndRemoveUntil(context, AppRouter.home, (route) => false);
+                              if (!mounted) return;
+                              await vm.checkHunter()
+                              ? Navigator.pushNamedAndRemoveUntil(context, AppRouter.home, (_) => false)
+                              : Navigator.pushNamedAndRemoveUntil(context, AppRouter.createHunter, (_) => false);
                             }
                           },
                           child: Container(
@@ -172,10 +181,11 @@ class _SignInScreenState extends State<SignInScreen> {
                           onTap: () async {
                             final success = await vm.signInWithEmail(emailController.text, passwordController.text);
 
-                            if (!context.mounted) return;
-
                             if (success) {
-                              Navigator.pushNamedAndRemoveUntil(context, AppRouter.home, (route) => false);
+                              if (!mounted) return;
+                              await vm.checkHunter()
+                              ? Navigator.pushNamedAndRemoveUntil(context, AppRouter.home, (_) => false)
+                              : Navigator.pushNamedAndRemoveUntil(context, AppRouter.createHunter, (_) => false);
                             }
                           },
                           child: Container(

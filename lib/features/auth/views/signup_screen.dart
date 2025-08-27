@@ -147,10 +147,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           onTap: () async {
                             final success = await vm.signInWithGoogle();
 
-                            if (!context.mounted) return;
-
                             if (success) {
-                              Navigator.pushNamedAndRemoveUntil(context, AppRouter.home, (route) => false);
+                              if (!mounted) return;
+                              await vm.checkHunter()
+                              ? Navigator.pushNamedAndRemoveUntil(context, AppRouter.home, (_) => false)
+                              : Navigator.pushNamedAndRemoveUntil(context, AppRouter.createHunter, (_) => false);
                             }
                           },
                           child: Container(
@@ -189,10 +190,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           onTap: () async {
                             final success = await vm.signUpWithEmail(emailController.text, passwordController.text, confirmedPasswordController.text);
 
-                            if (!context.mounted) return;
-
                             if (success) {
-                              Navigator.pushNamedAndRemoveUntil(context, AppRouter.home, (route) => false);
+                              if (!mounted) return;
+                              await vm.checkHunter()
+                              ? Navigator.pushNamedAndRemoveUntil(context, AppRouter.home, (_) => false)
+                              : Navigator.pushNamedAndRemoveUntil(context, AppRouter.createHunter, (_) => false);
                             }
                           },
                           child: Container(

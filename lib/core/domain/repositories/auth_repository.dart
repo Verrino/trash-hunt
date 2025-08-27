@@ -4,5 +4,5 @@ abstract class AuthRepository {
   Future<AppUser?> signInWithEmail(String email, String password);
   Future<AppUser?> signInWithGoogle();
   Future<AppUser?> signUpWithEmail(String email, String password);
-
+  Future<bool> isHunterExists(String userId);
 }

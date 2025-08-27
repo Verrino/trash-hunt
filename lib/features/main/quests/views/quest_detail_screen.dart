@@ -1,12 +1,10 @@
-import 'dart:io';
-
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 
 class QuestDetailScreen extends StatefulWidget {
-  final String type;
+  final Map<String, dynamic> questData;
 
-  const QuestDetailScreen({super.key, required this.type});
+  const QuestDetailScreen({super.key, required this.questData});
 
   @override
   State<QuestDetailScreen> createState() => _QuestDetailScreenState();
@@ -57,38 +55,55 @@ class _QuestDetailScreenState extends State<QuestDetailScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.type),
+        title: Text(widget.questData['title']),
       ),
       body: _isLoading
         ? Center(child: CircularProgressIndicator())
         : SizedBox(
             width: MediaQuery.of(context).size.width,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Container(
-                  width: 300,
-                  height: 300,
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey),
-                    borderRadius: BorderRadius.circular(12),
+            child: SafeArea(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const SizedBox(height: 16),
+                  Container(
+                    width: MediaQuery.of(context).size.width,
+                    padding: EdgeInsets.symmetric(horizontal: 20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text("Deskripsi Misi"),
+                        Text(widget.questData['description']),
+                        const SizedBox(height: 8),
+                        Text("Tingkat Kesulitan: ${widget.questData['quest_difficulty']}"),
+                      ],
+                    ),
                   ),
-                  child: CameraPreview(_controller),
-                ),
-                const SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: () async {
-                    try {
-                      await _initializeControllerFuture;
-                      final image = await _controller.takePicture();
-                      print("Image captured: ${image.path}");
-                    } catch (e) {
-                      print("Error capturing image: $e");
-                    }
-                  },
-                  child: Text("Capture Image"),
-                ),
-              ],
+                  const SizedBox(height: 16),
+                  Container(
+                    width: 300,
+                    height: 300,
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: CameraPreview(_controller),
+                  ),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () async {
+                      try {
+                        await _initializeControllerFuture;
+                        final image = await _controller.takePicture();
+                        print("Image captured: ${image.path}");
+                      } catch (e) {
+                        print("Error capturing image: $e");
+                      }
+                    },
+                    child: Text("Capture Image"),
+                  ),
+                ],
+              ),
             ),
         ),
     );

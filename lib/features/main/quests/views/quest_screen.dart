@@ -11,11 +11,11 @@ class QuestScreen extends StatefulWidget {
 }
 
 class _QuestScreenState extends State<QuestScreen> {
-  late List<Map<String, dynamic>> trashList;
+  late List<Map<String, dynamic>> dailyQuestList;
 
   Future<List<Map<String, dynamic>>> fetchTrashTypes() async {
     final vm = context.read<QuestViewModel>();
-    return await vm.getTrash();
+    return await vm.getDailyQuests();
   }
 
   @override
@@ -31,7 +31,7 @@ class _QuestScreenState extends State<QuestScreen> {
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return Center(child: Text('No data available'));
           } else {
-            trashList = snapshot.data!;
+            dailyQuestList = snapshot.data!;
             return buildHomeScreen();
           }
         },
@@ -47,7 +47,7 @@ class _QuestScreenState extends State<QuestScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("Quests"),
+          Text("Daily Quests"),
           const SizedBox(height: 16),
           GridView.builder(
             shrinkWrap: true,
@@ -58,10 +58,12 @@ class _QuestScreenState extends State<QuestScreen> {
               crossAxisSpacing: 12,
               mainAxisSpacing: 1,
             ),
-            itemCount: trashList.length,
+            itemCount: dailyQuestList.length,
             itemBuilder: (context, index) {
-              final trash = trashList[index];
-              return QuestCard(trashType: trash['type']);
+              final quest = dailyQuestList[index];
+              return QuestCard(
+                questData: quest,
+              );
             },
           ),
         ],

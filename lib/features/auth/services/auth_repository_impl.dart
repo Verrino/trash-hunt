@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import "package:firebase_auth/firebase_auth.dart";
 import 'package:google_sign_in/google_sign_in.dart';
 import '../../../core/domain/repositories/auth_repository.dart';
@@ -5,6 +6,7 @@ import '../../../core/domain/entities/app_user.dart';
 
 class AuthRepositoryImpl extends AuthRepository {
   final _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
 
   AuthRepositoryImpl();
@@ -27,7 +29,7 @@ class AuthRepositoryImpl extends AuthRepository {
     try {
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
       if (googleUser == null) {
-       throw Exception('Google sign-in failed');
+        throw Exception('Google sign-in failed');
       }
       final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
 
@@ -57,5 +59,16 @@ class AuthRepositoryImpl extends AuthRepository {
     }
 
     return null;
+  }
+  
+  @override
+  Future<bool> isHunterExists(String userId) async {
+    final doc = await _firestore.collection('hunters').doc(userId).get();
+    return doc.exists;
+  }
+
+  Future<void> signOut() async {
+    await _auth.signOut();
+    await _googleSignIn.signOut();
   }
 }

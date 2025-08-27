@@ -1,13 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:trash_hunt/core/domain/entities/trash.dart';
-import 'package:trash_hunt/features/main/services/trash_repository_impl.dart';
+import 'package:trash_hunt/core/domain/entities/quest.dart';
+import 'package:trash_hunt/features/main/services/quest_repository_impl.dart';
 
 class QuestViewModel extends ChangeNotifier {
-  final TrashRepositoryImpl _trashService;
-  QuestViewModel(this._trashService);
+  final QuestRepositoryImpl _questService;
+  QuestViewModel(this._questService);
 
-  Future<List<Map<String, dynamic>>> getTrash() async {
-    final List<Trash> trash = await _trashService.getTrashTypes();
-    return trash.map((e) => e.toMap()).toList();
+  String? _errorMessage;
+  String? get errorMessage => _errorMessage;
+
+  Future<List<Map<String, dynamic>>> getDailyQuests() async {
+    final List<Quest> quests = await _questService.getDailyQuests();
+    _set();
+    return quests.map((e) => e.toMap()).toList();
+  }
+
+  void _set({String? error}) {
+    if (error != null) _errorMessage = error;
+    notifyListeners();
   }
 }

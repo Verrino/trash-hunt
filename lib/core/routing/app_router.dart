@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:trash_hunt/features/auth/views/signin_screen.dart';
 import 'package:trash_hunt/features/auth/views/signup_screen.dart';
+import 'package:trash_hunt/features/main/create_hunter/views/create_hunter_screen.dart';
 import 'package:trash_hunt/features/main/home/views/trash_detail_screen.dart';
 import 'package:trash_hunt/features/main/main_screen.dart';
+import 'package:trash_hunt/features/main/profile/views/edit_profile_screen.dart';
 import 'package:trash_hunt/features/main/quests/views/quest_detail_screen.dart';
 
 class AppRouter {
@@ -11,8 +13,10 @@ class AppRouter {
   static const String home = "/home";
   static const String quests = "/quests";
   static const String profile = "/profile";
+  static const String editProfile = "/edit-profile";
   static const String trashDetail = "/trash-detail";
   static const String questDetail = "/quest-detail";
+  static const String createHunter = "/create-hunter";
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -26,6 +30,8 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => MainScreen(initialIndex: 1));
       case profile:
         return MaterialPageRoute(builder: (_) => MainScreen(initialIndex: 2));
+      case editProfile:
+        return MaterialPageRoute(builder: (_) => EditProfileScreen());
       case trashDetail:
         final args = settings.arguments as Map<String, dynamic>;
         return MaterialPageRoute(
@@ -38,9 +44,11 @@ class AppRouter {
         final args = settings.arguments as Map<String, dynamic>;
         return MaterialPageRoute(
           builder: (_) => QuestDetailScreen(
-            type: args['type'],
+            questData: args['questData'],
           ),
         );
+      case createHunter:
+        return MaterialPageRoute(builder: (_) => CreateHunterScreen());
       default:
         return MaterialPageRoute(builder: (_) => SignInScreen());
     }

@@ -9,7 +9,7 @@ class ShowcaseCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       child: SizedBox(
-        width: 120,
+        width: 110,
         height: 100,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

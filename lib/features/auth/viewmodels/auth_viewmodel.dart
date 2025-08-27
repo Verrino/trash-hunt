@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import '../../../core/domain/entities/app_user.dart';
 import '../services/auth_repository_impl.dart';
@@ -17,7 +18,6 @@ class AuthViewModel extends ChangeNotifier {
 
   Future<bool> signInWithEmail(String email, String password) async {
     _set(loading: true, error: null);
-
 
     try {
       if (email.trim().isEmpty || password.isEmpty) {
@@ -78,6 +78,14 @@ class AuthViewModel extends ChangeNotifier {
     }
 
     return false;
+  }
+
+  Future<bool> checkHunter() async {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+
+    if (uid == null) return false;
+    
+    return await _authService.isHunterExists(uid);
   }
 
   void _set({bool? loading, String? error}) {

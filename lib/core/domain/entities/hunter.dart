@@ -1,50 +1,88 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Hunter {
   final String userId;
+  final String organizationId;
   final String username;
+  final String profilePictureUrl;
   final DateTime birthDate;
   final int totalTrash;
   final int level;
   final int exp;
   final int coins;
   final List<String> friendIds;
+  final List<Map<String, dynamic>> dailyQuests;
+  final List<Map<String, dynamic>> completedQuests;
+  final bool isQuestsCompleted;
+  final bool isQuestsGiven;
 
   Hunter({
     required this.userId,
+    this.organizationId = "",
     required this.username,
+    this.profilePictureUrl = "",
     required this.birthDate,
     this.totalTrash = 0,
     this.level = 1,
     this.exp = 0,
     this.coins = 0,
     this.friendIds = const [],
+    this.dailyQuests = const [],
+    this.completedQuests = const [],
+    this.isQuestsCompleted = false,
+    this.isQuestsGiven = false,
   });
 
   Map<String, dynamic> toJson() {
     return {
-      'userId': userId,
+      'user_id': userId,
+      'organization_id': organizationId,
       'username': username,
-      'birthDate': birthDate.toIso8601String(),
-      'totalTrash': totalTrash,
+      'profile_picture_url': profilePictureUrl,
+      'birth_date': birthDate.toIso8601String(),
+      'total_trash': totalTrash,
       'level': level,
       'exp': exp,
       'coins': coins,
-      'friendIds': friendIds,
+      'friend_ids': friendIds,
+      'daily_quests': dailyQuests,
+      'completed_quests': completedQuests,
+      'is_quests_completed': isQuestsCompleted,
+      'is_quests_given': isQuestsGiven,
     };
   }
 
   factory Hunter.fromJson(Map<String, dynamic> json) {
+    if (json['birth_date'] is String) {
+      json['birth_date'] = DateTime.parse(json['birth_date']);
+    }
+    else if (json['birth_date'] is Timestamp) {
+      json['birth_date'] = (json['birth_date'] as Timestamp).toDate();
+    }
     return Hunter(
-      userId: json['userId'] as String,
+      userId: json['user_id'] as String,
+      organizationId: json['organization_id'] as String,
       username: json['username'] as String,
-      birthDate: DateTime.parse(json['birthDate'] as String),
-      totalTrash: json['totalTrash'] as int? ?? 0,
+      profilePictureUrl: json['profile_picture_url'] as String,
+      birthDate: json['birth_date'] as DateTime,
+      totalTrash: json['total_trash'] as int? ?? 0,
       level: json['level'] as int? ?? 1,
       exp: json['exp'] as int? ?? 0,
       coins: json['coins'] as int? ?? 0,
-      friendIds: (json['friendIds'] as List<dynamic>?)
+      friendIds: (json['friend_ids'] as List<dynamic>?)
           ?.map((e) => e as String)
           .toList() ??
           [],
+      dailyQuests: (json['daily_quests'] as List<dynamic>?)
+          ?.map((e) => e as Map<String, dynamic>)
+          .toList() ??
+          [],
+      completedQuests: (json['completed_quests'] as List<dynamic>?)
+          ?.map((e) => e as Map<String, dynamic>)
+          .toList() ??
+          [],
+      isQuestsCompleted: json['is_quests_completed'] as bool? ?? false,
+      isQuestsGiven: json['is_quests_given'] as bool? ?? false,
     );
   }
 }
