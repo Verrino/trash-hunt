@@ -15,6 +15,7 @@ class Hunter {
   final List<Map<String, dynamic>> completedQuests;
   final bool isQuestsCompleted;
   final bool isQuestsGiven;
+  final DateTime questGivenAt;
 
   Hunter({
     required this.userId,
@@ -31,7 +32,8 @@ class Hunter {
     this.completedQuests = const [],
     this.isQuestsCompleted = false,
     this.isQuestsGiven = false,
-  });
+    DateTime? questGivenAt,
+  }) : questGivenAt = questGivenAt ?? DateTime.now().subtract(const Duration(days: 1));
 
   Map<String, dynamic> toJson() {
     return {
@@ -49,6 +51,7 @@ class Hunter {
       'completed_quests': completedQuests,
       'is_quests_completed': isQuestsCompleted,
       'is_quests_given': isQuestsGiven,
+      'quest_given_at': questGivenAt.toIso8601String(),
     };
   }
 
@@ -59,6 +62,14 @@ class Hunter {
     else if (json['birth_date'] is Timestamp) {
       json['birth_date'] = (json['birth_date'] as Timestamp).toDate();
     }
+
+    if (json['quest_given_at'] is String) {
+      json['quest_given_at'] = DateTime.parse(json['quest_given_at']);
+    }
+    else if (json['quest_given_at'] is Timestamp) {
+      json['quest_given_at'] = (json['quest_given_at'] as Timestamp).toDate();
+    }
+
     return Hunter(
       userId: json['user_id'] as String,
       organizationId: json['organization_id'] as String,
@@ -83,6 +94,7 @@ class Hunter {
           [],
       isQuestsCompleted: json['is_quests_completed'] as bool? ?? false,
       isQuestsGiven: json['is_quests_given'] as bool? ?? false,
+      questGivenAt: json['quest_given_at'] as DateTime? ?? DateTime.now().subtract(const Duration(days: 1)),
     );
   }
 }

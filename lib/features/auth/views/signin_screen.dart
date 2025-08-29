@@ -86,6 +86,7 @@ class _SignInScreenState extends State<SignInScreen> {
                                     color: Colors.grey,
                                   ),
                                 ),
+                                keyboardType: TextInputType.emailAddress,
                               )
                             ],
                           ),
@@ -121,6 +122,7 @@ class _SignInScreenState extends State<SignInScreen> {
                                   ),
                                 ),
                                 obscureText: _obscurePassword,
+                                keyboardType: TextInputType.visiblePassword,
                               ),
                             ],
                           ),

@@ -110,6 +110,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               const SizedBox(height: 16),
               InkWell(
+                onTap: () {
+                  
+                },
+                child: Container(
+                  width: 350,
+                  height: 60,
+                  decoration: BoxDecoration(
+                    color: scheme.secondaryContainer,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    children: [
+                      const SizedBox(width: 16),
+                      Icon(Icons.settings),
+                      SizedBox(width: 8),
+                      Text('Pengaturan'),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              InkWell(
                 onTap: () async {
                   final success = await vm.signOut();
                   if (success) {

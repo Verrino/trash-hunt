@@ -37,8 +37,8 @@ class Quest {
 
   Map<String, dynamic> toMap() {
     return {
-      'questId': questId,
-      'questType': questType,
+      'quest_id': questId,
+      'quest_type': questType,
       'quest_difficulty': questDifficulty,
       'title': title,
       'trash': trash,

@@ -12,6 +12,7 @@ import 'package:trash_hunt/features/main/create_hunter/viewmodels/create_hunter_
 import 'package:trash_hunt/features/main/home/viewmodels/home_viewmodel.dart';
 import 'package:trash_hunt/features/main/profile/viewmodels/edit_profile_viewmodel.dart';
 import 'package:trash_hunt/features/main/profile/viewmodels/profile_viewmodel.dart';
+import 'package:trash_hunt/features/main/quests/viewmodels/quest_detail_viewmodel.dart';
 import 'package:trash_hunt/features/main/quests/viewmodels/quest_viewmodel.dart';
 import 'package:trash_hunt/features/main/services/hunter_repository_impl.dart';
 import 'package:trash_hunt/features/main/services/quest_repository_impl.dart';
@@ -57,6 +58,9 @@ void main() async {
         ),
         ChangeNotifierProvider(
           create: (_) => EditProfileViewModel(HunterRepositoryImpl()),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => QuestDetailViewModel(HunterRepositoryImpl(), QuestRepositoryImpl()),
         ),
       ],
       child: const MyApp(),

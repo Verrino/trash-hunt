@@ -1,5 +1,9 @@
-import 'package:camera/camera.dart';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:trash_hunt/core/routing/app_router.dart';
+import 'package:trash_hunt/features/main/quests/viewmodels/quest_detail_viewmodel.dart';
 
 class QuestDetailScreen extends StatefulWidget {
   final Map<String, dynamic> questData;
@@ -11,55 +15,31 @@ class QuestDetailScreen extends StatefulWidget {
 }
 
 class _QuestDetailScreenState extends State<QuestDetailScreen> {
-  late CameraController _controller;
-  late Future<void> _initializeControllerFuture;
-
-  bool _isLoading = true;
+  String? _capturedImagePath;
 
   @override
   void initState() {
     super.initState();
-    initializeCamera().then((_) {
-      setState(() {
-        _isLoading = false;
-      });
-    }).catchError((error) {
-      setState(() {
-        _isLoading = false;
-      });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<QuestDetailViewModel>().set(null);
     });
-  }
-
-  Future<void> initializeCamera() async {
-    try {
-      var cameras = await availableCameras();
-      final firstCamera = cameras.first;
-      _controller = CameraController(
-        firstCamera,
-        ResolutionPreset.medium,
-      );
-      _initializeControllerFuture = _controller.initialize();
-      await _initializeControllerFuture;
-    } catch (e) {
-      print("Error initializing camera: $e");
-    }
   }
 
   @override
   void dispose() {
-    _controller.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final vm = context.watch<QuestDetailViewModel>();
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.questData['title']),
       ),
-      body: _isLoading
-        ? Center(child: CircularProgressIndicator())
-        : SizedBox(
+      body: Stack(
+        children: [
+          SizedBox(
             width: MediaQuery.of(context).size.width,
             child: SafeArea(
               child: Column(
@@ -76,36 +56,82 @@ class _QuestDetailScreenState extends State<QuestDetailScreen> {
                         Text(widget.questData['description']),
                         const SizedBox(height: 8),
                         Text("Tingkat Kesulitan: ${widget.questData['quest_difficulty']}"),
+                        const SizedBox(height: 8),
+                        Text("Progress: ${vm.progress}/${widget.questData['target_count']}"),
                       ],
                     ),
                   ),
                   const SizedBox(height: 16),
-                  Container(
-                    width: 300,
-                    height: 300,
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: CameraPreview(_controller),
-                  ),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () async {
-                      try {
-                        await _initializeControllerFuture;
-                        final image = await _controller.takePicture();
-                        print("Image captured: ${image.path}");
-                      } catch (e) {
-                        print("Error capturing image: $e");
+                  InkWell(
+                    onTap: () async {
+                      final imagePath = await Navigator.pushNamed(context, AppRouter.camera);
+          
+                      if (imagePath != null) {
+                        setState(() {
+                          _capturedImagePath = imagePath as String;
+                        });
                       }
                     },
-                    child: Text("Capture Image"),
+                    child: Container(
+                      width: 300,
+                      height: 300,
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: _capturedImagePath == null
+                        ? Icon(Icons.camera_alt)
+                        : ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: Image.file(
+                              File(_capturedImagePath!),
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                    ),
                   ),
+                  const SizedBox(height: 16),
+                  if (vm.reasonMessage != null) ... [
+                    Text(
+                      vm.reasonMessage!,
+                      style: TextStyle(color: Colors.red),
+                    ),
+                    const SizedBox(height: 16)
+                  ],
+                  if (!vm.isLoading)
+                    InkWell(
+                      onTap: () async {
+                        if (_capturedImagePath == null) {
+                          vm.set("Please capture an image");
+                          return;
+                        }
+                        final success = await vm.submitQuest(File(_capturedImagePath!), widget.questData);
+                        if (success) {
+                          Navigator.pop(context);
+                        }
+                      },
+                      child: Container(
+                        padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.inversePrimary,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text('Kumpul Misi'),
+                      ),
+                    ),
                 ],
               ),
             ),
-        ),
+          ),
+          if (vm.isLoading)
+          Container(
+            color: Colors.black.withValues(alpha: 0.3),
+            child: const Center(
+              child: CircularProgressIndicator(),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

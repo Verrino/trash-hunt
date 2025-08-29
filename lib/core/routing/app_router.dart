@@ -6,6 +6,7 @@ import 'package:trash_hunt/features/main/home/views/trash_detail_screen.dart';
 import 'package:trash_hunt/features/main/main_screen.dart';
 import 'package:trash_hunt/features/main/profile/views/edit_profile_screen.dart';
 import 'package:trash_hunt/features/main/quests/views/quest_detail_screen.dart';
+import 'package:trash_hunt/widgets/camera_screen.dart';
 
 class AppRouter {
   static const String signin = "/signin";
@@ -17,6 +18,7 @@ class AppRouter {
   static const String trashDetail = "/trash-detail";
   static const String questDetail = "/quest-detail";
   static const String createHunter = "/create-hunter";
+  static const String camera = "/camera";
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -49,6 +51,8 @@ class AppRouter {
         );
       case createHunter:
         return MaterialPageRoute(builder: (_) => CreateHunterScreen());
+      case camera:
+        return MaterialPageRoute(builder: (_) => CameraScreen());
       default:
         return MaterialPageRoute(builder: (_) => SignInScreen());
     }

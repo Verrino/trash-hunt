@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:trash_hunt/core/config/level_config.dart';
 import 'package:trash_hunt/core/domain/entities/hunter.dart';
 import 'package:trash_hunt/core/domain/repositories/hunter_repository.dart';
+import 'package:trash_hunt/core/services/server_timestamp.dart';
 
 class HunterRepositoryImpl extends HunterRepository {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -41,12 +42,12 @@ class HunterRepositoryImpl extends HunterRepository {
   }) async {
     final updates = <String, dynamic>{
       if (username != null) 'username': username,
-      if (birthDate != null) 'birthDate': Timestamp.fromDate(birthDate),
-      if (totalTrash != null) 'totalTrash': totalTrash,
+      if (birthDate != null) 'birth_date': Timestamp.fromDate(birthDate),
+      if (totalTrash != null) 'total_trash': totalTrash,
       if (level != null) 'level': level,
       if (exp != null) 'exp': exp,
       if (coins != null) 'coins': coins,
-      if (friendIds != null) 'friendIds': friendIds,
+      if (friendIds != null) 'friend_ids': friendIds,
       'updatedAt': FieldValue.serverTimestamp(),
     };
 
@@ -73,7 +74,7 @@ class HunterRepositoryImpl extends HunterRepository {
       if (!snap.exists) return;
 
       final d = snap.data()!;
-      final oldTrash = (d['totalTrash'] ?? 0) as int;
+      final oldTrash = (d['total_trash'] ?? 0) as int;
       final oldExp   = (d['exp'] ?? 0) as int;
       final oldLevel = (d['level'] ?? 1) as int;
       final oldCoins = (d['coins'] ?? 0) as int;
@@ -101,7 +102,7 @@ class HunterRepositoryImpl extends HunterRepository {
       }
 
       tx.update(ref, {
-        'totalTrash': newTrash,
+        'total_trash': newTrash,
         'exp': expAcc,
         'level': level,
         'coins': newCoins,
@@ -139,6 +140,7 @@ class HunterRepositoryImpl extends HunterRepository {
     }).toList();
 
     await _firestore.collection('hunters').doc(uid).update({
+      'quest_given_at': FieldValue.serverTimestamp(),
       'is_quests_given': true,
       'daily_quests': FieldValue.arrayUnion(dailyQuests),
     });
@@ -162,10 +164,71 @@ class HunterRepositoryImpl extends HunterRepository {
 
   @override
   Future<void> resetDailyQuests(String uid) async {
+    final now = await ServerTimestamp.now;
+    final questGivenAt = await getQuestGivenAt(uid);
+
+    final nowDate = DateTime(now.year, now.month, now.day);
+    final questGivenDate = DateTime(questGivenAt.year, questGivenAt.month, questGivenAt.day);
+
+    print("Current Date: $nowDate, Quest Given Date: $questGivenDate, Beda: ${nowDate.isAfter(questGivenDate)}");
+
+    if (nowDate.isAfter(questGivenDate)) {
+      await _firestore.collection('hunters').doc(uid).update({
+        'daily_quests': [],
+        'is_quests_given': false,
+        'is_quests_completed': false,
+      });
+    }
+  }
+
+  Future<DateTime> getQuestGivenAt(String uid) async {
+    final hunter = await getHunter(uid);
+    if (hunter == null) {
+      return (await ServerTimestamp.now).subtract(const Duration(days: 1));
+    }
+
+    return hunter.questGivenAt;
+  }
+
+  Future<int> getProgress(String uid, String questId) async {
+    final hunter = await getHunter(uid);
+    if (hunter == null) return 0;
+
+    final quest = hunter.dailyQuests.firstWhere((q) => q['quest_id'] == questId);
+    if (quest == null) return 0;
+
+    return quest['progress'] ?? 0;
+  }
+
+  Future<void> updateProgress(String uid, Map<String, dynamic> questData, int progress, bool isDone) async {
+    final hunter = await getHunter(uid);
+    if (hunter == null) return;
+
+    await applyProgress(userId: uid, totalTrashDelta: progress);
+
+    if (isDone) {
+      await applyProgress(userId: uid, coinsDelta: questData['coins_reward'], expDelta: questData['exp_reward']);
+      await _firestore.collection('hunters').doc(uid).update({
+        'completed_quests': FieldValue.arrayUnion([{
+          'quest_id': questData['quest_id'],
+          'completed_at': FieldValue.serverTimestamp(),
+        }]),
+      });
+    }
+
+    final quests = hunter.dailyQuests.map((q) {
+      if (q['quest_id'] == questData['quest_id']) {
+        return {
+          'quest_id': questData['quest_id'],
+          'progress': progress,
+          'is_done': isDone,
+        };
+      }
+      return q;
+    }).toList();
+
     await _firestore.collection('hunters').doc(uid).update({
-      'daily_quests': FieldValue.arrayRemove([]),
-      'is_quests_given': false,
-      'is_quests_completed': false,
+      'daily_quests': quests,
     });
   }
 

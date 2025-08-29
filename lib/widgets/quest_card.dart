@@ -8,7 +8,7 @@ class QuestCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    String capitalizedTitle = questData['title'][0].toUpperCase() + questData['title'].substring(1);
+    String capitalizedTitle = questData['trash'][0].toUpperCase() + questData['trash'].substring(1);
     return Card(
       elevation: 3,
       shape: RoundedRectangleBorder(
