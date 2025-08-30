@@ -48,4 +48,15 @@ class Quest {
       'coins_reward': coinsReward,
     };
   }
+
+  Quest.empty()
+      : questId = '',
+        questType = '',
+        questDifficulty = '',
+        title = '',
+        trash = '',
+        description = '',
+        targetCount = 0,
+        expReward = 0,
+        coinsReward = 0;
 }

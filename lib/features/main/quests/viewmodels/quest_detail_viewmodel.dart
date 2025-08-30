@@ -1,11 +1,9 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:trash_hunt/features/main/services/hunter_repository_impl.dart';
 import 'package:trash_hunt/features/main/services/quest_repository_impl.dart';
 
 class QuestDetailViewModel extends ChangeNotifier {
-  final HunterRepositoryImpl _hunterRepository;
   final QuestRepositoryImpl _questRepository;
 
   bool _isLoading = false;
@@ -17,19 +15,19 @@ class QuestDetailViewModel extends ChangeNotifier {
   String? _reasonMessage;
   String? get reasonMessage => _reasonMessage;
 
-  QuestDetailViewModel(this._hunterRepository, this._questRepository);
+  QuestDetailViewModel(this._questRepository);
 
   Future<bool> submitQuest(File imageFile, Map<String, dynamic> questData) async {
     _set(isLoading: true);
     final response = await _questRepository.submitQuest(imageFile, questData);
-    print(response);
-    var reason = null;
+    var reason = "Sampah yang kamu ambil benar!";
     if (response[0] == false) {
       reason = response[2];
     }
     _set(isLoading: false, progress: response[1], reason: reason);
 
     if (progress >= questData['target_count']) {
+      _set(progress: 0, reason: null);
       return true;
     }
     return false;
@@ -46,7 +44,8 @@ class QuestDetailViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void set(String? reason) {
+  void set({int? progress, String? reason}) {
+    if (progress != null) _progress = progress;
     if (reason != null) {
       _reasonMessage = reason;
     } else {

@@ -112,17 +112,13 @@ class HunterRepositoryImpl extends HunterRepository {
   }
 
   @override
-  Future<Hunter?> getHunter(String uid) async {
-    var doc = await _firestore.collection('hunters').doc(uid).get(const GetOptions(source: Source.cache));
-    
-    if (!doc.exists) {
-      doc = await _firestore.collection('hunters').doc(uid).get();
-      if (!doc.exists) return null;
-    }
-
+  Future<Hunter?> getHunter(String uid, {bool forceRefresh = false}) async {
+    var doc = await _firestore.collection('hunters').doc(uid).get(
+      forceRefresh ? const GetOptions(source: Source.server) : null
+    );
+    if (!doc.exists) return null;
     final data = doc.data();
     if (data == null) return null;
-
     return Hunter.fromJson(data);
   }
 
@@ -142,7 +138,7 @@ class HunterRepositoryImpl extends HunterRepository {
     await _firestore.collection('hunters').doc(uid).update({
       'quest_given_at': FieldValue.serverTimestamp(),
       'is_quests_given': true,
-      'daily_quests': FieldValue.arrayUnion(dailyQuests),
+      'daily_quests': dailyQuests,
     });
   }
 
@@ -200,18 +196,35 @@ class HunterRepositoryImpl extends HunterRepository {
     return quest['progress'] ?? 0;
   }
 
-  Future<void> updateProgress(String uid, Map<String, dynamic> questData, int progress, bool isDone) async {
+  Future<void> updateProgress(String uid, Map<String, dynamic> questData, int newProgress, bool isDone) async {
     final hunter = await getHunter(uid);
     if (hunter == null) return;
 
-    await applyProgress(userId: uid, totalTrashDelta: progress);
+    final quest = hunter.dailyQuests.cast<Map<String, dynamic>>().firstWhere(
+      (q) => q['quest_id'] == questData['quest_id'],
+      orElse: () => <String, dynamic>{},
+    );
 
-    if (isDone) {
-      await applyProgress(userId: uid, coinsDelta: questData['coins_reward'], expDelta: questData['exp_reward']);
+    final prevProgress = quest.isNotEmpty ? (quest['progress'] ?? 0) as int : 0;
+    final prevIsDone = quest.isNotEmpty ? (quest['is_done'] ?? false) as bool : false;
+
+    final progressDelta = (newProgress - prevProgress).clamp(0, questData['target_count'] ?? 1);
+
+    if (progressDelta > 0) {
+      await applyProgress(userId: uid, totalTrashDelta: progressDelta.toInt());
+    }
+
+    if (isDone && !prevIsDone) {
+      await applyProgress(
+        userId: uid,
+        coinsDelta: questData['coins_reward'],
+        expDelta: questData['exp_reward'],
+      );
+      final serverTime = await ServerTimestamp.now;
       await _firestore.collection('hunters').doc(uid).update({
         'completed_quests': FieldValue.arrayUnion([{
           'quest_id': questData['quest_id'],
-          'completed_at': FieldValue.serverTimestamp(),
+          'completed_at': serverTime,
         }]),
       });
     }
@@ -220,7 +233,7 @@ class HunterRepositoryImpl extends HunterRepository {
       if (q['quest_id'] == questData['quest_id']) {
         return {
           'quest_id': questData['quest_id'],
-          'progress': progress,
+          'progress': newProgress,
           'is_done': isDone,
         };
       }

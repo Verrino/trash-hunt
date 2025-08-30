@@ -60,7 +60,7 @@ void main() async {
           create: (_) => EditProfileViewModel(HunterRepositoryImpl()),
         ),
         ChangeNotifierProvider(
-          create: (_) => QuestDetailViewModel(HunterRepositoryImpl(), QuestRepositoryImpl()),
+          create: (_) => QuestDetailViewModel(QuestRepositoryImpl()),
         ),
       ],
       child: const MyApp(),

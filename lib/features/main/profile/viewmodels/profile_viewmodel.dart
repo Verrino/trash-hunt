@@ -16,10 +16,10 @@ class ProfileViewModel extends ChangeNotifier {
   String? _errorMessage;
   String? get errorMessage => _errorMessage;
 
-  Future<void> getHunter() async {
+  Future<void> getHunter({bool forceRefresh = false}) async {
     try {
       final uid = FirebaseAuth.instance.currentUser?.uid;
-      _hunter = await _hunterService.getHunter(uid!);
+      _hunter = await _hunterService.getHunter(uid!, forceRefresh: forceRefresh);
     } catch(e) {
       _set(error: e.toString());
       debugPrint("Error fetching hunter: $e");

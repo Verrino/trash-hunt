@@ -33,7 +33,6 @@ class GoogleAiService {
         model: "models/gemma-3-27b-it"
       );
       final answer = (response?.content?.parts?.first as TextPart).text;
-      print(answer);
       return answer.replaceAll('\n', '').trim();
     } catch (e) {
       print('Error: $e');

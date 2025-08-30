@@ -3,11 +3,17 @@ import 'package:flutter/material.dart';
 class DatePickerFormField extends StatefulWidget {
   final DateTime? initialDate;
   final Function(DateTime) onDateSelected;
+  final TextStyle? textStyle;
+  final TextStyle? hintStyle;
+  final Color? iconColor;
 
   const DatePickerFormField({
     super.key,
     this.initialDate,
     required this.onDateSelected,
+    this.textStyle,
+    this.hintStyle,
+    this.iconColor,
   });
 
   @override
@@ -48,9 +54,16 @@ class _DatePickerFormFieldState extends State<DatePickerFormField> {
     return TextField(
       controller: _controller,
       readOnly: true,
+      style: widget.textStyle,
       decoration: InputDecoration(
-        border: OutlineInputBorder(),
-        suffixIcon: Icon(Icons.calendar_today),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        filled: true,
+        fillColor: Colors.white,
+        hintText: "Pilih tanggal lahir",
+        hintStyle: widget.hintStyle,
+        suffixIcon: Icon(Icons.calendar_today, color: widget.iconColor ?? Colors.green.shade700),
       ),
       onTap: _pickDate,
     );

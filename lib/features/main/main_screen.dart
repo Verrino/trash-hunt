@@ -13,12 +13,13 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
+  final GlobalKey<ProfileScreenState> profileKey = GlobalKey<ProfileScreenState>();
   late int _currentIndex;
 
-  final List<Widget> _pages = const [
-    HomeScreen(),
-    QuestScreen(),
-    ProfileScreen(),
+  List<Widget> get _pages => [
+    const HomeScreen(),
+    const QuestScreen(),
+    ProfileScreen(key: profileKey),
   ];
 
   @override
@@ -38,7 +39,14 @@ class _MainScreenState extends State<MainScreen> {
       ),
       bottomNavigationBar: AppNavigationBar(
           currentIndex: _currentIndex,
-          onDestinationSelected: (i) => setState(() => _currentIndex = i)
+          onDestinationSelected: (i) {
+            setState(() {
+              _currentIndex = i;
+            });
+            if (i == 2 && profileKey.currentState != null) {
+              profileKey.currentState?.refreshHunter();
+            }
+          }
       ),
     );
   }
