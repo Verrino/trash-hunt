@@ -283,8 +283,76 @@ class _QuestDetailScreenState extends State<QuestDetailScreen> with SingleTicker
                                     _capturedImagePath = null;
                                   });
                                   if (!context.mounted) return;
-                                  if (success && Navigator.canPop(context)) {
-                                    Navigator.pop(context);
+                                  if (success) {
+                                    await showDialog(
+                                      context: context,
+                                      barrierDismissible: false,
+                                      builder: (context) => AlertDialog(
+                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+                                        backgroundColor: Colors.green.shade50,
+                                        title: Row(
+                                          children: [
+                                            Icon(Icons.emoji_events, color: Colors.amber.shade700, size: 32),
+                                            const SizedBox(width: 8),
+                                            Text(
+                                              "Misi Selesai!",
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.green.shade800,
+                                                ),
+                                            ),
+                                          ],
+                                        ),
+                                        content: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Text(
+                                              "Selamat! Kamu telah menyelesaikan misi ini dan mendapatkan:",
+                                              style: TextStyle(color: Colors.green.shade900),
+                                              textAlign: TextAlign.center,
+                                            ),
+                                            const SizedBox(height: 16),
+                                            Row(
+                                              mainAxisAlignment: MainAxisAlignment.center,
+                                              children: [
+                                                Icon(Icons.star, color: Colors.orange.shade400),
+                                                const SizedBox(width: 4),
+                                                Text(
+                                                  "+${widget.questData['exp_reward']} XP",
+                                                  style: TextStyle(
+                                                    color: Colors.orange.shade700,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                                const SizedBox(width: 16),
+                                                Icon(Icons.monetization_on, color: Colors.amber.shade700),
+                                                const SizedBox(width: 4),
+                                                Text(
+                                                  "+${widget.questData['coins_reward']} Coins",
+                                                  style: TextStyle(
+                                                    color: Colors.amber.shade800,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                        actions: [
+                                          TextButton(
+                                            style: TextButton.styleFrom(
+                                              foregroundColor: Colors.green.shade700,
+                                              textStyle: const TextStyle(fontWeight: FontWeight.bold),
+                                            ),
+                                            onPressed: () {
+                                              Navigator.of(context).pop(); // Tutup dialog
+                                              Navigator.of(context).pop(); // Kembali ke quest_screen
+                                            },
+                                            child: const Text("OK"),
+                                          ),
+                                        ],
+                                      ),
+                                    );
                                   }
                                 },
                               ),

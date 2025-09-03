@@ -17,6 +17,7 @@ dependencies:
   firebase_core: ^4.0.0
   firebase_auth: ^6.0.1
   flutter_gemini: ^3.0.0
+  flutter_launcher_icons: ^0.14.4
   google_sign_in: ^6.2.1
   provider: ^6.1.5+1
 
@@ -48,3 +49,8 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/icons/trash-hunt-icon.png"
